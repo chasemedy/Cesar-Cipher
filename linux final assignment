@@ -1,0 +1,47 @@
+import sys
+
+def encode_letter(letter, shift):
+    if not letter.isalpha():  # Ignore non-alphabetic characters
+        return letter
+
+    ascii_offset = ord('A') if letter.isupper() else ord('a')
+    shifted_ascii = (ord(letter) - ascii_offset + shift) % 26 + ascii_offset
+    return chr(shifted_ascii)
+
+def encode_message(message, shift):
+    encoded_message = ''
+    for char in message:
+        encoded_char = encode_letter(char, shift)
+        encoded_message += encoded_char
+    return encoded_message
+
+if __name__ == '__main__':
+    if len(sys.argv) != 2:
+        print("Usage: python script.py <amount_to_shift>")
+        sys.exit(1)
+
+    try:
+        amount_to_shift = int(sys.argv[1])
+    except ValueError:
+        print("Error: Amount to shift must be an integer.")
+        sys.exit(1)
+
+    encoded_blocks = []
+    for line in sys.stdin:
+        line = line.rstrip().upper()
+        encoded_line = encode_message(line, amount_to_shift)
+
+        # Add encoded line to the list in blocks of five letters
+        for i in range(0, len(encoded_line), 5):
+            block = encoded_line[i:i+5]
+            if len(block) == 5:
+                encoded_blocks.append(block)
+
+        # Print ten blocks per line
+        if len(encoded_blocks) >= 10:
+            print(' '.join(encoded_blocks[:10]))
+            encoded_blocks = encoded_blocks[10:]
+
+    # Print any remaining blocks
+    if encoded_blocks:
+        print(' '.join(encoded_blocks))
